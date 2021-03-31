@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="rus">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>Weather</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <main>
+        <div class="header">
+            <h1>Погода здесь</h1>
+            <button class="refresh-geo"><span>Обновить геолокацию</span></button>
+        </div>
+        <div class="favorites-header">
+            <h2>Избранное</h2>
+            <form class="search-form" name="search">
+                <label>
+                    <input class="search-field" type="search" name="q" placeholder="Добавить новый город">
+                </label>
+                <button class="search-button" type="submit">
+                    <span>+</span>
+                </button>
+            </form>
+        </div>
+        <ul class="favorites">
+
+        </ul>
+<!--        <button onclick="clearLocal()">Get coords</button>-->
+    </main>
+
+</body>
+<template id="favorite-city-card">
+    <div class="favorite-city-header">
+        <h3 class="favorite-city-name">Moscow</h3>
+        <span class="favorite-temperature">5&degC</span>
+        <img class="weather-icon" src="img/Cloud.svg">
+        <button class="close-button">x</button>
+    </div>
+    <ul class="city-data">
+        <li class="weather-data"><span class="title">Ветер</span> <span class="description">северно-южный 10м/с</span></li>
+        <li class="weather-data"><span class="title">Облачность</span> <span class="description">облачно</span></li>
+        <li class="weather-data"><span class="title">Давление</span><span class="description">750мм.рт.ст.</span></li>
+        <li class="weather-data"><span class="title">Влажность</span><span class="description">100%</span></li>
+        <li class="weather-data"><span class="title">Координаты</span><span class="description">[100, 100]</span></li>
+    </ul>
+</template>
+<template id="current-city-card">
+    <ul class="current-city">
+        <li class="current-city-name-container">
+            <h2 class="current-city-name">${cityName}</h2>
+        </li>
+        <li class="weather-icon-container">
+            <img class="current-weather-icon" src="">
+        </li>
+        <li class="temperature-container">
+            <span class="current-temperature">${Math.round(answer.main.temp)}&degC</span>
+        </li>
+    </ul>
+    <ul class="city-data">
+        <li class="weather-data"><span class="title">Ветер</span> <span class="description">${degreesToDirections(answer.wind.deg)} ${answer.wind.speed}м/с</span></li>
+        <li class="weather-data"><span class="title">Облачность</span> <span class="description">${answer.clouds.all}%</span></li>
+        <li class="weather-data"><span class="title"> Давление</span><span class="description">${answer.main.pressure}гПа</span></li>
+        <li class="weather-data"><span class="title">Влажность</span><span class="description">${answer.main.humidity}%</span></li>
+        <li class="weather-data"><span class="title">Координаты</span><span class="description">[${Math.round(lat)}, ${Math.round(lon)}]</span></li>
+    </ul>
+</template>
+<template id="current-city-loader">
+    <div class="loading-box">
+        <h2>Подождите данные загружаются</h2>
+    </div>
+</template>
+<template id="favorite-city-loader">
+    <div class="favorite-city-header">
+        <h3 class="favorite-city-name">Данные загружаются</h3>
+        <button class="close-button">x</button>
+    </div>
+</template>
+<script src="scripts/main.js"></script>
+</html>

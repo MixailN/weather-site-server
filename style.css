@@ -1,0 +1,265 @@
+body {
+    margin: 0;
+    padding: 0 4vw 0 4vw;
+    font-size: 2.5vw;
+}
+
+main {
+    width: 100%;
+    color: gray;
+}
+
+h1 {
+    font-size: 4.5vw;
+    justify-self: start;
+}
+
+h2 {
+    font-size: 4.5vw;
+    margin: 0;
+}
+h3 {
+    font-size: 4vw;
+    margin: 0;
+}
+
+ul {
+    margin: 0;
+    padding: 0;
+}
+
+li {
+    list-style-type: none;
+}
+
+.header {
+    display: grid;
+    align-items: center;
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.refresh-geo {
+    width: auto;
+    padding: 1.5vw 1vw 1.5vw 1vw;
+    background-color: darkgray;
+    border: darkgray;
+    border-radius: 10px;
+    justify-self: center;
+}
+
+.current-city-container{
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-column-gap: 60px;
+    align-items: center;
+    margin-bottom: 5vw;
+}
+
+.current-city{
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.current-city-name-container {
+    grid-column-start: 1;
+    grid-column-end: 3;
+}
+
+.current-weather-icon {
+    width: 12vw;
+}
+
+.current-temperature {
+    font-size: 10vw;
+}
+
+.favorites-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.search-field {
+    width: 30vw;
+    font-size: 2vw;
+    border: none;
+    color: #789296;
+    background-color: lightgray;
+    padding: 1vw;
+    margin-right: 2vw;
+}
+
+.search-form {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    width: 100%;
+}
+
+.search-button {
+    display: flex;
+    flex-shrink: 0;
+    padding: 0;
+    font-size: 1.5vw;
+    width: 3vw;
+    height: 3vw;
+    background-color: darkgray;
+    border: lightgray;
+    border-radius: 100%;
+    justify-content: center;
+    align-items: center;
+}
+
+.favorites {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-column-gap: 60px;
+    align-items: center;
+}
+
+.favorite-city {
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.favorite-city-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.favorite-city-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 100%;
+}
+
+.city-data {
+    display: flex;
+    flex-direction: column;
+}
+
+.weather-data {
+    display: flex;
+    grid-column-start: 1;
+    grid-column-end: 5;
+    justify-content: space-between;
+    background-color: darkgray;
+    margin: 3px 0 3px 0;
+    padding: 3px 3px 3px 3px;
+}
+
+.title {
+    color: white;
+}
+
+.description {
+    color: lightgray;
+}
+
+.favorite-temperature {
+    font-size: 5vw;
+}
+
+.weather-icon {
+    width: 8vw;
+    flex-shrink: 0;
+}
+
+.close-button {
+    padding: 0;
+    font-size: 1.5vw;
+    width: 3vw;
+    height: 3vw;
+    flex-grow: 0;
+    flex-shrink: 0;
+    text-align: center;
+    background-color: darkgray;
+    border: lightgray;
+    border-radius: 50%;
+}
+
+.loading-box {
+    display: flex;
+    grid-column-start: 1;
+    grid-column-end: 3;
+    justify-content: center;
+}
+
+@media (max-width: 768px) {
+    label {
+        display: block;
+        width: 100%;
+    }
+
+    body {
+        font-size: 4vw;
+    }
+
+    h1 {
+        font-size: 6vw;
+        justify-self: start;
+    }
+
+    h2 {
+        font-size: 6vw;
+        margin: 0;
+    }
+    h3 {
+        font-size: 5.5vw;
+        margin: 0;
+    }
+
+    .header {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .current-city-container{
+        grid-template-columns: repeat(1, 1fr);
+    }
+
+    .favorites-header {
+        flex-direction: column;
+        align-items: start;
+    }
+
+    .search-field {
+        width: 100%;
+    }
+
+    .favorites {
+        grid-template-columns: repeat(1, 1fr);
+    }
+
+    .favorite-city-header {
+        flex-wrap: nowrap;
+    }
+
+    h1 {
+        justify-self: start;
+    }
+
+    .refresh-geo span {
+        display: none;
+    }
+
+    .refresh-geo {
+        width: 10vw;
+        height: 10vw;
+        background: url("img/Refresh_icon.svg") no-repeat;
+        justify-self: end;
+    }
+
+    .search-button {
+        width: 5vw;
+        height: 5vw;
+    }
+
+    .close-button {
+        width: 5vw;
+        height: 5vw;
+    }
+}
