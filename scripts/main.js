@@ -31,13 +31,25 @@ document.addEventListener('DOMContentLoaded', init);
 function init() {
     //localStorage.clear();
     getLocation();
-    for(let key of Object.keys(localStorage)) {
-        let count = localStorage.getItem(key);
-        console.log(key + "1");
-        while(count--) {
-            onloadFavoriteCity(key);
+    let favoritesUrl = `http://localhost:3000/favorites`;
+    let xhr = new XMLHttpRequest();
+    xhr.responseType = "json";
+    xhr.open('GET', favoritesUrl);
+    xhr.send();
+    xhr.onload =function () {
+        if(xhr.status !== 200) {
+            alert('Ошибка соединения');
+        } else {
+            let answer = xhr.response;
+            for (let i = 0; i < answer.length; i++) {
+                console.log(answer[i]);
+                onloadFavoriteCity(answer[i].city_name);
+            }
         }
-    }
+    };
+    xhr.onerror = function () {
+        alert("Ошибка соединения");
+    };
 }
 
 function clearLocal() {
@@ -87,13 +99,13 @@ function onloadFavoriteCity(name) {
 }
 
 function getFavoriteCity(name){
-    let weather_url = `http://localhost:3000/weather/city?q=${name}`;
+    let weatherUrl = `http://localhost:3000/weather/city?q=${name}`;
     let xhr = new XMLHttpRequest();
     const liLoader = document.createElement("li");
     favoriteList.appendChild(liLoader);
     liLoader.appendChild(document.importNode(favoriteLoader.content, true));
     xhr.responseType = "json";
-    xhr.open("GET", weather_url);
+    xhr.open("GET", weatherUrl);
     xhr.send();
     xhr.onload = function() {
         if (xhr.status !== 200) {
@@ -101,8 +113,23 @@ function getFavoriteCity(name){
             liLoader.remove();
         } else {
             let answer = xhr.response;
-            liLoader.remove();
-            addFavoriteCard(answer);
+            let postUrl = `http://localhost:3000/favorites?q=${answer.name}`;
+            let xhr2 = new XMLHttpRequest();
+            xhr2.open('POST', postUrl);
+            xhr2.send();
+            xhr2.onload = function () {
+                if(xhr2.status !== 200) {
+                    alert(`Ошибка ${xhr.status}: ${xhr.statusText}`);
+                    liLoader.remove();
+                } else {
+                    liLoader.remove();
+                    addFavoriteCard(answer);
+                }
+            }
+            xhr2.onerror = function () {
+                alert("Ошибка подключения к базе данных");
+                liLoader.remove();
+            }
             let count = localStorage.getItem(answer.name);
             if(count == null) {
                 localStorage.setItem(answer.name, "1");
@@ -140,9 +167,8 @@ async function geoSuccess(position) {
     divLoader.classList.add("current-city-container");
     divLoader.appendChild(document.importNode(loader.content, true));
     parentElement.insertBefore(divLoader, nextElement);
-    let cityName = await getCityName(lat, lon);
     let answer = await getWeather(lat, lon);
-    card.content.querySelectorAll(".current-city-name")[0].textContent = cityName;
+    card.content.querySelectorAll(".current-city-name")[0].textContent = answer.name;
     card.content.querySelectorAll(".current-weather-icon")[0].src =
         `http://openweathermap.org/img/wn/${answer.weather[0].icon}@2x.png`;
     card.content.querySelectorAll(".current-temperature")[0].textContent = `${Math.round(answer.main.temp)}\u00B0C`;
@@ -159,30 +185,11 @@ async function geoSuccess(position) {
     parentElement.insertBefore(divCity, nextElement);
 }
 
-async function getCityName(lat, lon) {
-    return new Promise(function (resolve, reject) {
-        let xhr = new XMLHttpRequest();
-        xhr.responseType = "json";
-        let city_url = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}`;
-        xhr.open("GET", city_url);
-        xhr.onload = function() {
-            if (xhr.status !== 200) {
-                alert(`Ошибка ${xhr.status}: ${xhr.statusText}`);
-            } else {
-                let answer = xhr.response;
-                resolve(answer.city);
-            }
-        };
-        xhr.send();
-    });
-
-}
-
 async function getWeather(lat, lon) {
     return new Promise(function (resolve, reject) {
         let xhr = new XMLHttpRequest();
         xhr.responseType = "json";
-        let weather_url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`
+        let weather_url = `http://localhost:3000/weather/coordinates?lat=${lat}&long=${lon}`;
         xhr.open("GET", weather_url);
         xhr.onload = function() {
             if (xhr.status !== 200) {
@@ -231,19 +238,26 @@ function geoFailure() {
 
 function deleteCity(element) {
     console.log(element.parentElement);
+    element.disabled = true;
     let header = element.parentElement;
     let li = header.parentElement;
     let key = header.children.item(0).textContent;
-    let count = localStorage.getItem(key);
-    if(parseInt(count) === 1) {
-        console.log("if 1 " + count);
-        localStorage.removeItem(key);
-        li.remove();
-    } else {
-        console.log("if more 1 " + count);
-        localStorage.setItem(key, `${count - 1}`);
-        li.remove();
-    }
+    let xhr = new XMLHttpRequest();
+    let deleteUrl = `http://localhost:3000/favorites?q=${key}`;
+    xhr.open('DELETE', deleteUrl);
+    xhr.send();
+    xhr.onload = function () {
+        if(xhr.status !== 200){
+            alert(`Ошибка ${xhr.status}: ${xhr.statusText}`);
+            element.disabled = false;
+        } else {
+            li.remove();
+        }
+    };
+    xhr.onerror = function () {
+        alert("Ошибка соединения");
+        element.disabled = false;
+    };
 }
 
 function degreesToDirections(degree) {

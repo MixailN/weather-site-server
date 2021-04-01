@@ -67,8 +67,38 @@ app.get('/weather/coordinates', function (req, res) {
     })
 });
 
-app.post('/favorites', function (req, res) {
-    console.log();
+app.get('/favorites', async function (req, res) {
+    console.log(`GET: ${req.url} \nData: all cities`);
+    db.any('SELECT * FROM public.cities').then(
+        data => {
+            res.send(data);
+        }
+    ).catch(e => {
+        console.log(e.message);
+        res.statusCode = 404;
+    });
+    //SELECT * FROM public.cities;
+});
+
+app.post('/favorites', async function (req, res) {
+    console.log(`POST: ${req.url} \nData: ${req.query.q}`);
+    db.none('INSERT INTO public.cities VALUES(${cityName})', {cityName: req.query.q}).then(
+        data => {
+            res.send(req.query.q);
+        }
+    ).catch(e => {
+        console.log(e.message);
+        res.statusCode = 404;
+    });
+
+    //INSERT INTO public.cities VALUE('Moscow');
+});
+
+app.delete('/favorites', async function (req, res) {
+    console.log(`DELETE: ${req.url} \nData: ${req.query.q}`);
+    await db.none('DELETE FROM public.cities WHERE ctid IN (SELECT ctid FROM public.cities WHERE city_name = ${cityName} LIMIT 1)', {cityName: req.query.q});
+    //DELETE FROM public.cities WHERE ctid IN (SELECT ctid FROM public.cities WHERE city_name = 'Moscow' LIMIT 1);
+    res.send(req.query.q);
 });
 
 app.listen(3000);
