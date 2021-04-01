@@ -155,6 +155,37 @@ function getLocation() {
 async function geoSuccess(position) {
     let lat = position.coords.latitude;
     let lon = position.coords.longitude;
+    await getCurrentWeather(lat, lon);
+}
+
+async function getWeather(lat, lon) {
+    return new Promise(function (resolve, reject) {
+        let xhr = new XMLHttpRequest();
+        xhr.responseType = "json";
+        let weather_url = `http://localhost:3000/weather/coordinates?lat=${lat}&long=${lon}`;
+        xhr.open("GET", weather_url);
+        xhr.send();
+        xhr.onload = function() {
+            if (xhr.status !== 200) {
+                alert(`Ошибка ${xhr.status}: ${xhr.statusText}`);
+            } else {
+                resolve(xhr.response);
+            }
+        };
+        xhr.onerror = function () {
+            alert('Ошибка соединения');
+            resolve(undefined);
+        };
+    });
+}
+
+async function geoFailure() {
+    let lat = 59;
+    let lon = 30;
+    await getCurrentWeather(lat, lon);
+}
+
+async function getCurrentWeather(lat, lon) {
     console.log(document.getElementsByClassName("current-city-container").length);
     if(document.getElementsByClassName("current-city-container").length !== 0) {
         document.getElementsByClassName("current-city-container")[0].remove();
@@ -168,72 +199,26 @@ async function geoSuccess(position) {
     divLoader.appendChild(document.importNode(loader.content, true));
     parentElement.insertBefore(divLoader, nextElement);
     let answer = await getWeather(lat, lon);
-    card.content.querySelectorAll(".current-city-name")[0].textContent = answer.name;
-    card.content.querySelectorAll(".current-weather-icon")[0].src =
-        `http://openweathermap.org/img/wn/${answer.weather[0].icon}@2x.png`;
-    card.content.querySelectorAll(".current-temperature")[0].textContent = `${Math.round(answer.main.temp)}\u00B0C`;
-    let weatherData = card.content.querySelectorAll(".description");
-    weatherData[0].textContent = `${degreesToDirections(answer.wind.deg)} ${answer.wind.speed}м/с`;
-    weatherData[1].textContent = `${answer.clouds.all}%`;
-    weatherData[2].textContent = `${answer.main.pressure}гПа`;
-    weatherData[3].textContent = `${answer.main.humidity}%`;
-    weatherData[4].textContent = `[${Math.round(answer.coord.lon)}, ${Math.round(answer.coord.lat)}]`;
-    divLoader.remove();
-    const divCity = document.createElement("div");
-    divCity.classList.add("current-city-container");
-    divCity.appendChild(document.importNode(card.content, true));
-    parentElement.insertBefore(divCity, nextElement);
-}
-
-async function getWeather(lat, lon) {
-    return new Promise(function (resolve, reject) {
-        let xhr = new XMLHttpRequest();
-        xhr.responseType = "json";
-        let weather_url = `http://localhost:3000/weather/coordinates?lat=${lat}&long=${lon}`;
-        xhr.open("GET", weather_url);
-        xhr.onload = function() {
-            if (xhr.status !== 200) {
-                alert(`Ошибка ${xhr.status}: ${xhr.statusText}`);
-            } else {
-                resolve(xhr.response);
-            }
-        };
-        xhr.send();
-    });
-}
-
-function geoFailure() {
-    let weather_url = `https://api.openweathermap.org/data/2.5/weather?q=saint+petersburg&appid=${API_KEY}&units=metric`;
-    let xhr = new XMLHttpRequest();
-    xhr.responseType = "json";
-    xhr.open("GET", weather_url);
-    xhr.onload = function() {
-        if (xhr.status !== 200) {
-            alert(`Ошибка ${xhr.status}: ${xhr.statusText}`);
-        } else {
-            let answer = xhr.response;
-            currentCityContainer.innerHTML = `
-            <ul class="current-city">
-                <li class="current-city-name-container">
-                    <h2 class="current-city-name">Saint-Petersburg</h2>
-                </li>
-                <li class="weather-icon-container">
-                    <img class="current-weather-icon" src="http://openweathermap.org/img/wn/${answer.weather[0].icon}@2x.png">
-                </li>
-                <li class="temperature-container">
-                    <span class="current-temperature">${Math.round(answer.main.temp)}&degC</span>
-                </li>
-            </ul>
-            <ul class="city-data">
-                <li class="weather-data"><span class="title">Ветер</span> <span class="description">${degreesToDirections(answer.wind.deg)} ${answer.wind.speed}м/с</span></li>
-                <li class="weather-data"><span class="title">Облачность</span> <span class="description">${answer.clouds.all}%</span></li>
-                <li class="weather-data"><span class="title"> Давление</span><span class="description">${answer.main.pressure}гПа</span></li>
-                <li class="weather-data"><span class="title">Влажность</span><span class="description">${answer.main.humidity}%</span></li>
-                <li class="weather-data"><span class="title">Координаты</span><span class="description">[${Math.round(answer.coord.lon)}, ${Math.round(answer.coord.lat)}]</span></li>
-            </ul>`;
-        }
-    };
-    xhr.send();
+    if(answer !== undefined) {
+        card.content.querySelectorAll(".current-city-name")[0].textContent = answer.name;
+        card.content.querySelectorAll(".current-weather-icon")[0].src =
+            `http://openweathermap.org/img/wn/${answer.weather[0].icon}@2x.png`;
+        card.content.querySelectorAll(".current-temperature")[0].textContent = `${Math.round(answer.main.temp)}\u00B0C`;
+        let weatherData = card.content.querySelectorAll(".description");
+        weatherData[0].textContent = `${degreesToDirections(answer.wind.deg)} ${answer.wind.speed}м/с`;
+        weatherData[1].textContent = `${answer.clouds.all}%`;
+        weatherData[2].textContent = `${answer.main.pressure}гПа`;
+        weatherData[3].textContent = `${answer.main.humidity}%`;
+        weatherData[4].textContent = `[${Math.round(answer.coord.lon)}, ${Math.round(answer.coord.lat)}]`;
+        divLoader.remove();
+        const divCity = document.createElement("div");
+        divCity.classList.add("current-city-container");
+        divCity.appendChild(document.importNode(card.content, true));
+        parentElement.insertBefore(divCity, nextElement);
+    } else {
+        let element = document.getElementsByClassName('loading-box')[0];
+        element.children[0].textContent = 'Ошибка загрузки';
+    }
 }
 
 function deleteCity(element) {
